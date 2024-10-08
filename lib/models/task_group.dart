@@ -11,6 +11,7 @@ class TaskGroup {
     required this.color,
   });
 
+  //cria uma instância
   factory TaskGroup.fromMap(Map<String, dynamic> json) {
     return TaskGroup(
       id: json['id'],
