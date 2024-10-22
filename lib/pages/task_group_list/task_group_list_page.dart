@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_app/pages/task_list/task_list_page.dart';
+import 'package:todo_app/providers/task_group_provider.dart';
 
 class TaskGroupListPage extends StatelessWidget {
   const TaskGroupListPage({super.key});
@@ -15,8 +18,31 @@ class TaskGroupListPage extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text('TaskGroup'),
+      body: Consumer<TaskGroupProvider>(
+        builder: (context, provider, _) {
+          if (provider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return ListView.builder(
+            itemCount: provider.taskGroups.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                onTap: () {
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) 
+                                => TaskListPage(groupId: provider.taskGroups[index].id),
+                    ),
+                  );
+                },
+                title: Text(provider.taskGroups[index].name),
+              );
+            },
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
