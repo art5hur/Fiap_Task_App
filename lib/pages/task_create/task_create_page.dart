@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/models/task_model.dart';
+import 'package:todo_app/providers/task_provider.dart';
 
 class TaskCreatePage extends StatefulWidget {
   const TaskCreatePage({super.key, required this.groupId, this.task});
@@ -13,6 +15,9 @@ class TaskCreatePage extends StatefulWidget {
 
 class _TaskCreatePageState extends State<TaskCreatePage> {
   DateTime date = DateTime.now();
+  final _formKey = GlobalKey<FormState>();
+  final titleController = TextEditingController();
+  final subtitleController = TextEditingController();
 
   @override
   void initState() {
@@ -23,19 +28,26 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Task'),
+        title: const Text('Create Task'),
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(18.0),
-          child: Column(
-            children: [
-              //_buildTitle(),
-              const SizedBox(height: 20),
-              // _buildSubtitle(),
-              const SizedBox(height: 20),
-              //  _buildDatePicker(),
-            ],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Column(
+                  children: [
+                    _buildTitle(),
+                    const SizedBox(height: 20),
+                    _buildSubtitle(),
+                    const SizedBox(height: 20),
+                    _buildDatePicker(),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -48,6 +60,47 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
         icon: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  TextFormField _buildTitle() {
+    return TextFormField(
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Title required';
+        }
+        if (value.length > 25) {
+          return 'Title must be less than 25 characters';
+        }
+
+        return null;
+      },
+      controller: titleController,
+      decoration: const InputDecoration(
+        prefixIcon: Icon(Icons.title),
+        border: UnderlineInputBorder(),
+        label: Text('Title'),
+        hintText: 'Enter a description for the task',
+      ),
+    );
+  }
+
+  TextFormField _buildSubtitle() {
+    return TextFormField(
+      validator: (value) {
+        if (value != null && value.isNotEmpty && value.length > 50) {
+          return 'Title must be less than 25 characters';
+        }
+        return null;
+      },
+      maxLines: 3,
+      controller: subtitleController,
+      decoration: const InputDecoration(
+        border: UnderlineInputBorder(),
+        label: Text('SubTitle'),
+        hintText: 'Enter a description for the task',
+        prefixIcon: Icon(Icons.description_outlined),
+      ),
     );
   }
 
@@ -98,5 +151,23 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
     );
   }
 
-  Future<void> _submitForm() async {}
+  Future<void> _submitForm() async {
+    bool isValid =_formKey.currentState!.validate();
+      if(isValid){
+        final title = titleController.text;
+        final subtitle = subtitleController.text;
+        
+        final task = Task.create(
+          title: title, 
+          subtitle: subtitle,
+          date: date,
+          groupId: widget.groupId
+        );
+
+        await context.read<TaskProvider>()
+                  .createTask(task);
+
+        Navigator.pop(context);
+    }
+  }
 }

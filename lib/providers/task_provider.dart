@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/models/task_model.dart';
 import 'package:todo_app/repository/supabase_repository.dart';
 
-class TaskProvider extends ChangeNotifier {
-  final _repo = SupabaseRepository();
+class TaskProvider with ChangeNotifier {
+  final SupabaseRepository _repo = SupabaseRepository();
 
   List<Task> _tasks = [];
   List<Task> get tasks => _tasks;
@@ -23,4 +23,26 @@ class TaskProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> createTask (Task task) async {
+    try{
+      await _repo.createTask(task);
+      //_tasks = await _repo.listTasksByGroup(task.groupId);
+      _tasks.add(task);
+      notifyListeners();
+    }catch (e) {
+      print(e);
+    } 
+  }
+
+  Future<void> deleteTask (String taskId) async {
+    try{
+      await _repo.deleteTask(taskId);
+      _tasks.removeWhere((task) => task.id == taskId);
+      notifyListeners();
+    }catch (e) {
+      print(e);
+    } 
+  }
+
 }
