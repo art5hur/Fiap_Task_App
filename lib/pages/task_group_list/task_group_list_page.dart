@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_app/pages/task_list/task_list_page.dart';
+import 'package:todo_app/pages/task_group_list/widgets/task_group_item.dart';
 import 'package:todo_app/providers/task_group_provider.dart';
 
 class TaskGroupListPage extends StatelessWidget {
@@ -24,21 +24,10 @@ class TaskGroupListPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           return ListView.builder(
-            itemCount: provider.taskGroups.length,
+            itemCount: provider.taskGroupsWithCounts.length,
             itemBuilder: (context, index) {
-              final taskGroup = provider.taskGroups[index];
-              return ListTile(
-                title: Text(taskGroup.name),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (BuildContext context) {
-                      context.read<TaskGroupProvider>().selectedTaskGroup =
-                          taskGroup;
-                      return const TaskListPage();
-                    }),
-                  );
-                },
-              );
+              final taskGroupWithCount = provider.taskGroupsWithCounts[index];
+              return TaskGroupItem(taskGroupWithCount: taskGroupWithCount);
             },
           );
         },

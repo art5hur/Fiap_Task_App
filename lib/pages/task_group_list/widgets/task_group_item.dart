@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_app/models/task_group.dart';
+import 'package:todo_app/pages/task_list/task_list_page.dart';
+import 'package:todo_app/providers/task_group_provider.dart';
 
 class TaskGroupItem extends StatelessWidget {
   const TaskGroupItem({
@@ -28,7 +31,15 @@ class TaskGroupItem extends StatelessWidget {
                 taskGroupWithCount.totalTasks)
             : 0,
       ),
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (BuildContext context) {
+            context.read<TaskGroupProvider>().selectedTaskGroup =
+                taskGroupWithCount.taskGroup;
+            return const TaskListPage();
+          }),
+        );
+      },
     );
   }
 }

@@ -37,15 +37,11 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
             key: _formKey,
             child: Column(
               children: [
-                Column(
-                  children: [
-                    _buildTitle(),
-                    const SizedBox(height: 20),
-                    _buildSubtitle(),
-                    const SizedBox(height: 20),
-                    _buildDatePicker(),
-                  ],
-                ),
+                _buildTitle(),
+                const SizedBox(height: 20),
+                _buildSubtitle(),
+                const SizedBox(height: 20),
+                _buildDatePicker(),
               ],
             ),
           ),
@@ -152,22 +148,19 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
   }
 
   Future<void> _submitForm() async {
-    bool isValid =_formKey.currentState!.validate();
-      if(isValid){
-        final title = titleController.text;
-        final subtitle = subtitleController.text;
-        
-        final task = Task.create(
-          title: title, 
-          subtitle: subtitle,
-          date: date,
-          groupId: widget.groupId
-        );
+    if (_formKey.currentState!.validate()) {
+      final task = Task.create(
+        title: titleController.text,
+        subtitle: subtitleController.text,
+        date: date,
+        groupId: widget.groupId,
+      );
 
-        await context.read<TaskProvider>()
-                  .createTask(task);
+      await context.read<TaskProvider>().createTask(task);
 
-        Navigator.pop(context);
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     }
   }
 }
